@@ -2,8 +2,8 @@
 <br>
 
 > [!NOTE]
-> The Person:
-> ![person](src/Assets/person.png)
+> The Person:<br>
+> ![person](src/Assets/person.png)<br>
 > id: 1106685608610517002
 
 to join:<br>
