@@ -35,7 +35,7 @@ https://github.com/justpleaseSTAYhere/StayHooks<br>
 `The person` doesnt really know any program. Atleast in the project.<br>
 Any code she has ever done for stay, was AI generated `slop`.<br>
 The only contribution she has made was a 2,300 code lines file made completely with ChatGPT/Gemini that would not work in production.
-The whole source code can be viewed here: [1106685608610517002's_source_code](src\source-code\1106685608610517002's_source_code.html)<br>[1106685608610517002'stermsofuse](src\source-code\1106685608610517002'stermsofuse.html)
+The whole source code can be viewed here:<br>[1106685608610517002's_source_code](src/source-code/1106685608610517002_source_code.html)<br>[1106685608610517002'stermsofuse](src/source-code/1106685608610517002_termsofuse.html)
 
 ## Gold3nDreams
 Was the head of Socials and the Discord Server, eventually left because he couldnt hold `the person` anymore. They had just an argument. All people which are joining the server eventually came from He/Xe.
