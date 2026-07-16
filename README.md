@@ -1,7 +1,7 @@
 # Hello lovely stay members
 <br>
 
-> ![NOTE]
+> [!NOTE]
 > The Person:
 > ![person](src/Assets/person.png)
 > id: 1106685608610517002
