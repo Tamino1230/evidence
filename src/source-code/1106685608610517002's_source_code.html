@@ -1,0 +1,2611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stay-here</title>
+    <style>
+        /* All existing styles remain the same */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #4b65ba, #e7a2d6);
+            min-height: 100vh;
+            height: 100vh;
+            width: 100vw;
+            /* Remove centering */
+            display: block;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100vw;
+            height: 100vh;
+            max-width: none;
+            max-height: none;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 0;
+            overflow: hidden;
+            box-shadow: none;
+            /* Remove margin */
+        }
+        /* Make homepageContainer and roomContainer fill the space */
+        #homepageContainer,
+        #roomContainer,
+        #appContainer {
+            height: calc(100vh - 80px); /* Adjust if your header height changes */
+            min-height: 0;
+            width: 100vw;
+            overflow: auto;
+        }
+        /* Make flex layouts fill space */
+        #homepageContainer > div,
+        #roomContainer > div {
+            height: 100%;
+            min-height: 0;
+        }
+        
+        .header {
+            background: #c8d6ff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .user-status {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-status span {
+            font-size: 14px;
+        }
+        
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .refresh-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        .main {
+            display: flex;
+            height: 500px;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: #f5f7fa;
+            border-right: 1px solid #e0e6ed;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 20px;
+        }
+        
+        .sidebar h3 {
+            margin-bottom: 15px;
+            color: #a8afc6;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .add-friend-btn {
+            background: #ffb1f7;
+            color: rgb(255, 255, 255);
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .users-list {
+            list-style: none;
+        }
+        
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e6ed;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #d4deff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .user-id {
+            font-size: 11px;
+            color: #666;
+        }
+        
+        .friend-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .accept-btn {
+            color: #bb66ad;
+        }
+        
+        .reject-btn {
+            color: #5236f4;
+        }
+        
+        .delete-btn {
+            color: #f700ff;
+        }
+        
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e6ed;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            position: relative;
+            line-height: 1.5;
+        }
+        
+        .message.sent {
+            align-self: flex-end;
+            background: #fa67ac;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message.received {
+            align-self: flex-start;
+            background: #e5e5ea;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message-sender {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .message-time {
+            font-size: 10px;
+            opacity: 0.7;
+            text-align: right;
+            margin-top: 4px;
+        }
+        
+        .chat-input {
+            padding: 15px 20px;
+            border-top: 1px solid #e0e6ed;
+            display: flex;
+            gap: 10px;
+            background: white;
+        }
+        
+        .message-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #e0e6ed;
+            border-radius: 24px;
+            outline: none;
+            font-size: 15px;
+        }
+        
+        .send-btn {
+            background: #cc33ff;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            padding: 0 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .auth-container {
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .auth-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .form-title {
+            margin-bottom: 20px;
+            color: #ff33c9;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e6ed;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+        
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            background: #3366ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .auth-switch {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .auth-switch button {
+            background: none;
+            border: none;
+            color: #3366ff;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: #4caf50;
+            color: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .notification.error {
+            background: #f44336;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .modal-btn {
+            padding: 10px 15px;
+            background: #3366ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .main {
+                flex-direction: column;
+                height: 600px;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .no-friends {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-style: italic;
+        }
+        
+        .user-id-display {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid #e0e6ed;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: #f0f2f5;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .tab-btn.active {
+            background: white;
+            border-bottom: 2px solid #3366ff;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .chat-info {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        /* NEW STYLES FOR IMAGE MANIPULATION */
+        .image-box {
+            background-color: transparent;
+            position: relative;
+            user-select: none;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .image-box-wrapper {
+            position: absolute;
+            transform-origin: center center;
+            user-select: none;
+            z-index: 2;
+        }
+
+        .dot {
+            height: 10px;
+            width: 10px;
+            background-color: #1E88E5;
+            position: absolute;
+            border-radius: 100px;
+            border: 1px solid white;
+            user-select: none;
+            z-index: 3;
+        }
+
+        .dot:hover {
+            background-color: #0D47A1;
+        }
+
+        .dot.left-top {
+            top: -5px;
+            left: -5px;
+            cursor: nw-resize;
+        }
+
+        .dot.left-bottom {
+            bottom: -5px;
+            left: -5px;
+            cursor: sw-resize;
+        }
+
+        .dot.right-top {
+            top: -5px;
+            right: -5px;
+            cursor: ne-resize;
+        }
+
+        .dot.right-bottom {
+            bottom: -5px;
+            right: -5px;
+            cursor: se-resize;
+        }
+
+        .dot.top-mid {
+            top: -5px;
+            left: calc(50% - 5px);
+            cursor: n-resize;
+        }
+
+        .dot.left-mid {
+            left: -5px;
+            top: calc(50% - 5px);
+            cursor: w-resize;
+        }
+
+        .dot.right-mid {
+            right: -5px;
+            top: calc(50% - 5px);
+            cursor: e-resize;
+        }
+
+        .dot.bottom-mid {
+            bottom: -5px;
+            left: calc(50% - 5px);
+            cursor: s-resize;
+        }
+
+        .dot.rotate {
+            top: -30px;
+            left: calc(50% - 5px);
+            cursor: url('https://findicons.com/files/icons/1620/crystal_project/16/rotate_ccw.png'), auto;
+        }
+
+        .rotate-link {
+            position: absolute;
+            width: 1px;
+            height: 15px;
+            background-color: #1E88E5;
+            top: -20px;
+            left: calc(50% + 0.5px);
+            z-index: -1;
+        }
+        
+        .image-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .image-control-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .context-menu {
+            position: fixed;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .context-menu-item {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+        
+        .context-menu-item:hover {
+            background: #f0f0f0;
+        }
+        
+        /* NEW STYLES FOR ACCOUNT/SETTINGS */
+        .account-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            transition: right 0.3s ease;
+            z-index: 1001;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .settings-panel.open {
+            right: 0;
+        }
+        
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #d4deff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .profile-name {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .profile-email {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .settings-option {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .settings-option:hover {
+            background: #f9f9f9;
+        }
+        
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        
+        .overlay.visible {
+            display: block;
+        }
+        
+        /* Hide room info when not authenticated */
+        #roomInfoOverlay {
+            display: none;
+            position: relative;
+            z-index: 2;
+            color: white;
+            text-align: center;
+            width: 100%;
+
+        }
+        /* Whiteboard Styles */
+        .whiteboard-container {
+            position: absolute;
+            background-color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            z-index: 2;
+            top: 100px;
+            left: 100px;
+            width: 500px;
+            height: 400px;
+        }
+        
+        .whiteboard-canvas {
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+        
+        .whiteboard-controls {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+        }
+        
+        .color-option {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .color-option.active {
+            border-color: #333;
+            transform: scale(1.2);
+        }
+        
+        .eraser-option {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .clear-option {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .brush-size {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .brush-size-label {
+            font-size: 12px;
+            color: #333;
+        }
+        
+        .brush-size-slider {
+            width: 60px;
+        }
+        
+        .whiteboard-menu {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            display: flex;
+            gap: 5px;
+        }
+        
+        .whiteboard-menu-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 4px;
+            padding: 5px 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        /* Disable movement for whiteboard */
+        .whiteboard-container .dot {
+            pointer-events: all;
+        }
+        
+        .whiteboard-container .dot:hover {
+            background-color: #0D47A1;
+        }
+    </style>
+    <!-- Firebase App (core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <!-- Firebase Authentication -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <!-- Cloud Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>STAY-here</h1>
+            <p>Connect with friends in real-time</p>
+            <div class="user-status" id="userStatus" style="display: none;">
+                <button class="account-btn" onclick="toggleSettings()">👤 Account</button>
+                <button class="refresh-btn" onclick="refreshPage()">🔄 Refresh</button>
+            </div>
+        </div>
+        
+        <div id="authContainer" class="auth-container">
+            <div class="auth-form">
+                <h2 class="form-title" id="formTitle">Sign In to Your Account</h2>
+                <input type="email" id="emailInput" class="form-input" placeholder="Email address">
+                <input type="password" id="passwordInput" class="form-input" placeholder="Password">
+                <button id="authButton" class="auth-btn" onclick="signIn()">Sign In</button>
+                <p class="auth-switch" id="authSwitch">Don't have an account? <button onclick="switchAuth()">Sign Up</button>
+                     <a href="#" onclick="showTermsOfUse()" style="color:#39003a; text-decoration:underline;">Terms of Use</a>.
+                </p>
+            </div>
+        </div>
+        
+        <div id="homepageContainer" style="display: none;">
+            <div style="display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; margin: 40px 0;">
+                <!-- Friend System (reuse your sidebar) -->
+                <div style="min-width: 320px; max-width: 350px;">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" onclick="switchTab('friends')">Friends</button>
+                        <button class="tab-btn" onclick="switchTab('requests')">Requests</button>
+                    </div>
+                    <div id="friendsTab" class="tab-content active">
+                        <div class="sidebar-section">
+                            <h3>
+                                My Friends
+                                <button class="add-friend-btn" onclick="showAddFriendModal()">+</button>
+                            </h3>
+                            <ul class="users-list" id="friendsList">
+                                <li class="no-friends">No friends yet. Add some friends!</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="requestsTab" class="tab-content">
+                        <div class="sidebar-section">
+                            <h3>Friend Requests</h3>
+                            <ul class="users-list" id="requestsList">
+                                <li class="no-friends">No pending requests</li>
+                            </ul>
+                        </div>
+                        <div class="sidebar-section">
+                            <h3>Sent Requests</h3>
+                            <ul class="users-list" id="sentRequestsList">
+                                <li class="no-friends">No sent requests</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Room System -->
+                <div style="min-width: 320px; max-width: 350px; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                    <h2 style="color: #5236f4;">Rooms</h2>
+                    <button class="auth-btn" style="background: #4b65ba;" onclick="showCreateRoomModal()">Create Room</button>
+                    <button class="auth-btn" style="background: #fa67ac;" onclick="showJoinRoomModal()">Join Room</button>
+                    <div id="myRoomsList" style="width: 100%; margin-top: 20px;">
+                        <h4 style="margin-bottom:10px;">My Created Rooms</h4>
+                        <ul id="createdRoomsUl" style="list-style:none; padding:0;"></ul>
+                        <h4 style="margin:20px 0 10px 0;">Your Rooms</h4>
+                        <ul id="joinedRoomsUl" style="list-style:none; padding:0;"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="roomInfoOverlay">
+            <h2 id="roomTitle"></h2>
+            <div style="margin:10px 0; font-size:13px;">Room code: <span id="roomCode"></span></div>
+            <button onclick="backToHomepage()" style="margin-top:20px; background:#fff; color:#4b65ba; border:none; border-radius:6px; padding:6px 16px; cursor:pointer;">⬅️ Back</button>
+        </div>
+        
+        <div id="roomContainer" style="display:none;">
+            <div style="display:flex; height:500px;">
+                
+                <!-- Left: Room Info & Background -->
+                <div id="roomInfoPanel" style="width:65%; min-width:200px; background:#4b65ba; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+                    <img id="roomBgImg" src="" alt="" style="display:none; max-width:100%; max-height:100%; border-radius:12px; position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:1;">
+                    
+                    <!-- Image Controls -->
+                    <div class="image-controls">
+                        <button class="image-control-btn" onclick="showAddImageModal()">Add Image</button>
+                        <button class="image-control-btn" id="screenShareBtn" onclick="toggleScreenShare()">Share Screen</button>
+                    </div>
+                    
+                    <!-- Container for user-added images -->
+                    <div id="userImagesContainer" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:2;"></div>
+                </div>
+                <!-- Right: Room Chat -->
+                <div style="flex:1; display:flex; flex-direction:column;">
+                    
+                    <div class="chat-header" style="background:#fff;">
+                        <h3 id="roomChatTitle">Chat</h3>
+                    </div>
+                    <div class="chat-messages" id="roomMessagesContainer">
+                        <div class="chat-info">Welcome to the room!</div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="roomMessageInput" class="message-input" placeholder="Type your message..." disabled>
+                        <button class="send-btn" id="roomSendBtn" onclick="sendRoomMessage()" disabled>Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="appContainer" style="display: none;">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <button onclick="backToHomepage()" style="margin-right:10px;">⬅️</button>
+                    <h3 id="currentChat">Friends Chat</h3>
+                    <span id="chatInfo">Only friends can see your messages</span>
+                </div>
+                
+            <div class="chat-messages" id="messagesContainer">
+                <div class="chat-info">Select a friend to start chatting</div>
+            </div>
+                
+                <div class="chat-input">
+                    <input type="text" id="messageInput" class="message-input" placeholder="Type your message..." disabled>
+                    <button class="send-btn" onclick="sendMessage()" disabled>Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="termsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Terms of Use</h3>
+                <button class="close-modal" onclick="closeModal('termsModal')">&times;</button>
+            </div>
+            <div style="font-size:14px; color:#444;">
+                <p>This is a placeholder for the Terms of Use. You can add your terms here later.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Friend Modal -->
+    <div id="addFriendModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Friend</h3>
+                <button class="close-modal" onclick="closeModal('addFriendModal')">&times;</button>
+            </div>
+            <input type="text" id="friendIdInput" class="modal-input" placeholder="Enter friend's User ID">
+            <button class="modal-btn" onclick="sendFriendRequest()">Send Request</button>
+        </div>
+    </div>
+
+    <div id="createRoomModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Room</h3>
+                <button class="close-modal" onclick="closeModal('createRoomModal')">&times;</button>
+            </div>
+            <input type="text" id="roomNameInput" class="modal-input" placeholder="Room name (optional)">
+            <label style="display:block; margin-bottom:10px;">
+                <span style="font-size:14px;">Background image (optional):</span>
+                <input type="file" id="roomBgInput" accept="image/*" style="margin-top:5px;">
+            </label>
+            <button class="modal-btn" onclick="finishRoom()">Create</button>
+        </div>
+    </div>
+
+    <!-- Join Room Modal -->
+        <div id="joinRoomModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Join Room</h3>
+                    <button class="close-modal" onclick="closeModal('joinRoomModal')">&times;</button>
+                </div>
+                <input type="text" id="roomCodeInput" class="modal-input" placeholder="Enter room code">
+                <button class="modal-btn" onclick="joinRoom()">Join</button>
+            </div>
+        </div>
+        
+    <!-- Add Image Modal -->
+    <div id="addImageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Image</h3>
+                <button class="close-modal" onclick="closeModal('addImageModal')">&times;</button>
+            </div>
+            <input type="file" id="imageInput" accept="image/*" class="modal-input">
+            <button class="modal-btn" onclick="addImageToRoom()">Add Image</button>
+        </div>
+    </div>
+    <div id="addWhiteboardModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Whiteboard</h3>
+                <button class="close-modal" onclick="closeModal('addWhiteboardModal')">&times;</button>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label>Size:</label>
+                <input type="range" id="whiteboardSize" min="200" max="800" value="400" style="width: 100%;">
+                <div style="text-align: center; font-size: 12px;" id="whiteboardSizeValue">400px</div>
+            </div>
+            <button class="modal-btn" onclick="addWhiteboardToRoom()">Add Whiteboard</button>
+        </div>
+    </div>
+    <!-- Context Menu -->
+    <div id="imageContextMenu" class="context-menu">
+        <div class="context-menu-item" onclick="copySelectedImage()">Copy</div>
+        <div class="context-menu-item" onclick="deleteSelectedImage()">Delete</div>
+    </div>
+    
+    <!-- Settings Panel -->
+    <div class="overlay" id="settingsOverlay" onclick="toggleSettings()"></div>
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <h3>Account Settings</h3>
+            <button class="close-modal" onclick="toggleSettings()">&times;</button>
+        </div>
+        <div class="profile-section">
+            <div class="profile-avatar" id="profileAvatar"></div>
+            <div class="profile-name" id="profileName"></div>
+            <div class="profile-email" id="profileEmail"></div>
+            <div class="user-id-display" style="margin-top: 10px; background: #f0f0f0; color: #333;" onclick="copyUserId()">
+                ID: <span id="profileUserId"></span> 📋
+            </div>
+        </div>
+        <div class="settings-option" onclick="logout()">
+            <span>🚪</span> Logout
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+
+    <script>
+        
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA8DtXnJQKwVG2GYbzeBysg-Hq9CdG3oPo",
+            authDomain: "stay-d88c9.firebaseapp.com",
+            databaseURL: "https://stay-d88c9-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "stay-d88c9",
+            storageBucket: "stay-d88c9.firebasestorage.app",
+            messagingSenderId: "44708487109",
+            appId: "1:44708487109:web:c1c9691e094002b3e9f5ac",
+            measurementId: "G-LY2E3SLCKS"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // DOM elements
+        const homepageContainer = document.getElementById('homepageContainer');
+        const authContainer = document.getElementById('authContainer');
+        const appContainer = document.getElementById('appContainer');
+        const userStatus = document.getElementById('userStatus');
+        const formTitle = document.getElementById('formTitle');
+        const authButton = document.getElementById('authButton');
+        const authSwitch = document.getElementById('authSwitch');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.querySelector('.send-btn');
+        const friendsList = document.getElementById('friendsList');
+        const requestsList = document.getElementById('requestsList');
+        const sentRequestsList = document.getElementById('sentRequestsList');
+        const notification = document.getElementById('notification');
+        const friendIdInput = document.getElementById('friendIdInput');
+        const currentChat = document.getElementById('currentChat');
+        const chatInfo = document.getElementById('chatInfo');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const settingsOverlay = document.getElementById('settingsOverlay');
+        const profileAvatar = document.getElementById('profileAvatar');
+        const profileName = document.getElementById('profileName');
+        const profileEmail = document.getElementById('profileEmail');
+        const profileUserId = document.getElementById('profileUserId');
+        const roomInfoOverlay = document.getElementById('roomInfoOverlay');
+        
+        // Track current user and friends
+        let currentUser = null;
+        let userData = null;
+        let selectedFriend = null;
+        let messagesListener = null;
+        
+        // NEW: Variables for image manipulation
+        let currentRoomId = null;
+        let currentRoomData = null;
+        let roomMessagesListener = null;
+        let selectedImage = null;
+        let copiedImage = null;
+        let imageCounter = 0;
+        let activeScreenShareStream = null;
+        let currentWhiteboard = null;
+        let isDrawing = false;
+        let currentColor = '#000000';
+        let brushSize = 5;
+        let isEraser = false;
+        let activeScreenShareWrapper = null;
+        
+        // Auth state listener
+        auth.onAuthStateChanged(async user => {
+            if (user) {
+                // User is signed in
+                currentUser = user;
+                userStatus.style.display = 'flex';
+                authContainer.style.display = 'none';
+                homepageContainer.style.display = 'block';
+                appContainer.style.display = 'none';
+                roomInfoOverlay.style.display = 'none'; // Hide room info by default
+                
+                // Initialize or get user data
+                await initializeUserData();
+                profileUserId.textContent = userData.userId;
+                profileName.textContent = userData.userId;
+                profileEmail.textContent = user.email;
+                profileAvatar.textContent = user.email.charAt(0).toUpperCase();
+                loadFriends();
+                loadFriendRequests();
+                await loadCreatedRooms();
+                await loadJoinedRooms();
+
+            } else {
+                // User is signed out
+                currentUser = null;
+                userData = null;
+                selectedFriend = null;
+                
+                // Remove listeners
+                if (messagesListener) {
+                    messagesListener();
+                }
+                
+                userStatus.style.display = 'none';
+                authContainer.style.display = 'block';
+                homepageContainer.style.display = 'none';
+                appContainer.style.display = 'none';
+                roomInfoOverlay.style.display = 'none'; // Ensure room info is hidden
+                settingsPanel.classList.remove('open');
+                settingsOverlay.classList.remove('visible');
+            }
+        });
+        
+        // Initialize user data or get existing
+        async function initializeUserData() {
+            const userRef = db.collection('users').doc(currentUser.uid);
+            const userDoc = await userRef.get();
+            
+            if (userDoc.exists) {
+                userData = userDoc.data();
+            } else {
+                // Create new user data with a unique ID
+                const userId = generateUserId();
+                userData = {
+                    email: currentUser.email,
+                    userId: userId,
+                    friends: [],
+                    friendRequests: [],
+                    sentRequests: [],
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                await userRef.set(userData);
+            }
+        }
+        
+        // Toggle settings panel
+        function toggleSettings() {
+            settingsPanel.classList.toggle('open');
+            settingsOverlay.classList.toggle('visible');
+        }
+
+        async function joinRoom() {
+            const roomCode = document.getElementById('roomCodeInput').value.trim();
+            if (!roomCode) {
+                showNotification('Please enter a room code', true);
+                return;
+            }
+
+            try {
+                const roomDoc = await db.collection('rooms').doc(roomCode).get();
+                if (!roomDoc.exists) {
+                    showNotification('Room not found', true);
+                    return;
+                }
+
+                const roomData = roomDoc.data();
+
+                // Add user to members array if not already present
+                if (!roomData.members || !roomData.members.includes(userData.userId)) {
+                    await db.collection('rooms').doc(roomCode).update({
+                        members: firebase.firestore.FieldValue.arrayUnion(userData.userId)
+                    });
+                }
+
+                showNotification('Joined room successfully!');
+                closeModal('joinRoomModal');
+                loadJoinedRooms();
+            } catch (err) {
+                showNotification('Error joining room', true);
+                console.error(err);
+            }
+        }
+
+        async function loadJoinedRooms() {
+            if (!currentUser || !userData) return;
+
+            try {
+                const roomsSnapshot = await db.collection('rooms')
+                    .where('members', 'array-contains', userData.userId)
+                    .get();
+
+                const joinedRoomsUl = document.getElementById('joinedRoomsUl');
+                joinedRoomsUl.innerHTML = '';
+
+                if (roomsSnapshot.empty) {
+                    joinedRoomsUl.innerHTML = '<li class="no-friends">You haven\'t joined any rooms yet</li>';
+                    return;
+                }
+
+                roomsSnapshot.forEach(doc => {
+                    const roomData = doc.data();
+                    const li = document.createElement('li');
+                    li.style.marginBottom = '10px';
+                    li.style.padding = '10px';
+                    li.style.backgroundColor = '#f0f2f5';
+                    li.style.borderRadius = '8px';
+                    li.innerHTML = `
+                        <div style="font-weight:bold;">${roomData.name || 'Unnamed Room'}</div>
+                        <div style="font-size:12px; color:#666;">Code: ${doc.id}</div>
+                        <button onclick="enterRoom('${doc.id}')" style="margin-top:5px; background:#5236f4; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Enter</button>
+                    `;
+                    joinedRoomsUl.appendChild(li);
+                });
+            } catch (err) {
+                console.error('Error loading joined rooms:', err);
+            }
+        }
+
+        async function loadCreatedRooms() {
+            if (!currentUser || !userData) return;
+
+            try {
+                const roomsSnapshot = await db.collection('rooms')
+                    .where('creatorId', '==', userData.userId)
+                    .get();
+
+                const createdRoomsUl = document.getElementById('createdRoomsUl');
+                createdRoomsUl.innerHTML = '';
+
+                if (roomsSnapshot.empty) {
+                    createdRoomsUl.innerHTML = '<li class="no-friends">You haven\'t created any rooms yet</li>';
+                    return;
+                }
+
+                roomsSnapshot.forEach(doc => {
+                    const roomData = doc.data();
+                    const li = document.createElement('li');
+                    li.style.marginBottom = '10px';
+                    li.style.padding = '10px';
+                    li.style.backgroundColor = '#f0f2f5';
+                    li.style.borderRadius = '8px';
+                    li.innerHTML = `
+                        <div style="font-weight:bold;">${roomData.name || 'Unnamed Room'}</div>
+                        <div style="font-size:12px; color:#666;">Code: ${doc.id}</div>
+                        <button onclick="enterRoom('${doc.id}')" style="margin-top:5px; background:#5236f4; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Enter</button>
+                    `;
+                    createdRoomsUl.appendChild(li);
+                });
+            } catch (err) {
+                console.error('Error loading created rooms:', err);
+            }
+        }
+
+        function showCreateRoomModal() {
+            document.getElementById('createRoomModal').style.display = 'flex';
+        }
+
+        function showJoinRoomModal() {
+            document.getElementById('joinRoomModal').style.display = 'flex';
+        }
+
+        async function finishRoom() {
+            const roomName = document.getElementById('roomNameInput').value.trim();
+            const bgFile = document.getElementById('roomBgInput').files[0];
+            let bgUrl = '';
+
+            if (bgFile) {
+                // In a real app, you would upload this to Firebase Storage
+                // For now, we'll just store a placeholder
+                bgUrl = URL.createObjectURL(bgFile);
+            }
+
+            const roomCode = generateRoomCode();
+            
+            try {
+                await db.collection('rooms').doc(roomCode).set({
+                    name: roomName,
+                    creatorId: userData.userId,
+                    members: [userData.userId],
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    background: bgUrl
+                });
+
+                showNotification('Room created successfully!');
+                closeModal('createRoomModal');
+                loadCreatedRooms();
+            } catch (err) {
+                showNotification('Error creating room', true);
+                console.error(err);
+            }
+        }
+
+        function generateRoomCode() {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+
+            function showAddWhiteboardModal() {
+        document.getElementById('addWhiteboardModal').style.display = 'flex';
+    }
+    
+    // Update whiteboard size value display
+    document.getElementById('whiteboardSize').addEventListener('input', function() {
+        document.getElementById('whiteboardSizeValue').textContent = this.value + 'px';
+    });
+    
+    function addWhiteboardToRoom() {
+        const container = document.getElementById('userImagesContainer');
+        const whiteboardWrapper = document.createElement('div');
+        whiteboardWrapper.className = 'image-box-wrapper whiteboard-container';
+        whiteboardWrapper.style.position = 'absolute';
+        whiteboardWrapper.style.top = '100px';
+        whiteboardWrapper.style.left = '100px';
+        whiteboardWrapper.style.width = '500px';
+        whiteboardWrapper.style.height = '400px';
+        whiteboardWrapper.style.zIndex = '5';
+        
+        const canvas = document.createElement('canvas');
+        canvas.className = 'whiteboard-canvas';
+        canvas.width = 500;
+        canvas.height = 400;
+        
+        // Set white background
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        whiteboardWrapper.appendChild(canvas);
+        
+        // Add controls
+        const controls = document.createElement('div');
+        controls.className = 'whiteboard-controls';
+        controls.innerHTML = `
+            <div class="color-option active" style="background-color: #000000;" data-color="#000000"></div>
+            <div class="color-option" style="background-color: #ff0000;" data-color="#ff0000"></div>
+            <div class="color-option" style="background-color: #00ff00;" data-color="#00ff00"></div>
+            <div class="color-option" style="background-color: #0000ff;" data-color="#0000ff"></div>
+            <div class="color-option" style="background-color: #ffff00;" data-color="#ffff00"></div>
+            <div class="color-option" style="background-color: #ff00ff;" data-color="#ff00ff"></div>
+            <div class="eraser-option" title="Eraser">E</div>
+            <div class="clear-option" title="Clear">C</div>
+            <div class="brush-size">
+                <span class="brush-size-label">Size:</span>
+                <input type="range" class="brush-size-slider" min="1" max="20" value="5">
+            </div>
+        `;
+        whiteboardWrapper.appendChild(controls);
+        
+        // Add menu
+        const menu = document.createElement('div');
+        menu.className = 'whiteboard-menu';
+        menu.innerHTML = `
+            <button class="whiteboard-menu-btn" onclick="closeWhiteboard(this.parentElement.parentElement)">X</button>
+        `;
+        whiteboardWrapper.appendChild(menu);
+        
+        container.appendChild(whiteboardWrapper);
+        
+        // Make resizable and rotatable but not draggable
+        addResizeControls(whiteboardWrapper);
+        
+        // Setup drawing functionality
+        setupWhiteboard(canvas, controls);
+        
+        showNotification('Whiteboard added. Use resize handles to adjust size.');
+    }
+    
+    // Setup whiteboard drawing functionality
+    function setupWhiteboard(canvas, controls) {
+        const ctx = canvas.getContext('2d');
+        
+        // Set up color options
+        const colorOptions = controls.querySelectorAll('.color-option');
+        colorOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                colorOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                currentColor = this.getAttribute('data-color');
+                isEraser = false;
+                
+                // Update brush size slider value
+                const brushSlider = controls.querySelector('.brush-size-slider');
+                brushSize = parseInt(brushSlider.value);
+            });
+        });
+        
+        // Set up eraser
+        const eraserOption = controls.querySelector('.eraser-option');
+        eraserOption.addEventListener('click', function() {
+            colorOptions.forEach(opt => opt.classList.remove('active'));
+            isEraser = true;
+            
+            // Update brush size slider value
+            const brushSlider = controls.querySelector('.brush-size-slider');
+            brushSize = parseInt(brushSlider.value);
+        });
+        
+        // Set up clear option
+        const clearOption = controls.querySelector('.clear-option');
+        clearOption.addEventListener('click', function() {
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        });
+        
+        // Set up brush size slider
+        const brushSlider = controls.querySelector('.brush-size-slider');
+        brushSlider.addEventListener('input', function() {
+            brushSize = parseInt(this.value);
+        });
+        
+        // Drawing functionality
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+        
+        function startDrawing(e) {
+            isDrawing = true;
+            draw(e);
+        }
+        
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            ctx.lineWidth = brushSize;
+            ctx.lineCap = 'round';
+            
+            if (isEraser) {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.strokeStyle = 'rgba(0,0,0,1)';
+            } else {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.strokeStyle = currentColor;
+            }
+            
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+        
+        function stopDrawing() {
+            isDrawing = false;
+            ctx.beginPath();
+        }
+    }
+    
+    // Close whiteboard
+    function closeWhiteboard(whiteboard) {
+        whiteboard.remove();
+    }
+    
+    // Add whiteboard button to image controls
+    function addWhiteboardButton() {
+        const imageControls = document.querySelector('.image-controls');
+        if (imageControls && !imageControls.querySelector('.whiteboard-control-btn')) {
+            const whiteboardBtn = document.createElement('button');
+            whiteboardBtn.className = 'image-control-btn whiteboard-control-btn';
+            whiteboardBtn.textContent = 'Add Whiteboard';
+            whiteboardBtn.onclick = addWhiteboardToRoom;
+            imageControls.appendChild(whiteboardBtn);
+        }
+    }
+    
+    // Modified makeElementDraggable function to skip whiteboards
+    function makeElementDraggable(element) {
+        // Skip if it's a whiteboard
+        if (element.classList.contains('whiteboard-container')) {
+            return;
+        }
+        
+        let isDragging = false;
+        let startX, startY, initialLeft, initialTop;
+        
+        element.addEventListener('mousedown', function(e) {
+            if (e.target.classList.contains('dot')) return;
+            
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            
+            const style = window.getComputedStyle(element);
+            initialLeft = parseInt(style.left, 10) || 0;
+            initialTop = parseInt(style.top, 10) || 0;
+            
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+            
+            e.preventDefault();
+        });
+        
+        function drag(e) {
+            if (!isDragging) return;
+            
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            
+            element.style.left = (initialLeft + dx) + 'px';
+            element.style.top = (initialTop + dy) + 'px';
+        }
+        
+        function stopDrag() {
+            isDragging = false;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', stopDrag);
+        }
+    }
+        async function enterRoom(roomId) {
+            try {
+                const roomDoc = await db.collection('rooms').doc(roomId).get();
+                if (!roomDoc.exists) {
+                    showNotification('Room not found', true);
+                    return;
+                }
+
+                currentRoomId = roomId;
+                currentRoomData = roomDoc.data();
+                
+                // Update UI
+                document.getElementById('roomTitle').textContent = currentRoomData.name || 'Unnamed Room';
+                document.getElementById('roomCode').textContent = roomId;
+                
+                // Show background if available
+                const bgImg = document.getElementById('roomBgImg');
+                if (currentRoomData.background) {
+                    bgImg.src = currentRoomData.background;
+                    bgImg.style.display = 'block';
+                } else {
+                    bgImg.style.display = 'none';
+                }
+                
+                // Clear previous images
+                document.getElementById('userImagesContainer').innerHTML = '';
+                
+                // Enable chat
+                document.getElementById('roomMessageInput').disabled = false;
+                document.getElementById('roomSendBtn').disabled = false;
+                
+                // Show room and room info
+                homepageContainer.style.display = 'none';
+                appContainer.style.display = 'none';
+                document.getElementById('roomContainer').style.display = 'block';
+                roomInfoOverlay.style.display = 'block';
+                
+                // Load messages
+                loadRoomMessages();
+
+                addWhiteboardButton();
+                
+            } catch (err) {
+                showNotification('Error entering room', true);
+                console.error(err);
+            }
+        }
+
+        function backToHomepage() {
+            // Clean up room resources
+            if (activeScreenShareStream) {
+                activeScreenShareStream.getTracks().forEach(track => track.stop());
+                activeScreenShareStream = null;
+            }
+            
+            if (activeScreenShareWrapper) {
+                activeScreenShareWrapper.remove();
+                activeScreenShareWrapper = null;
+            }
+            
+            // Remove room messages listener
+            if (roomMessagesListener) {
+                roomMessagesListener();
+                roomMessagesListener = null;
+            }
+            
+            // Reset UI
+            currentRoomId = null;
+            currentRoomData = null;
+            document.getElementById('roomContainer').style.display = 'none';
+            roomInfoOverlay.style.display = 'none';
+            homepageContainer.style.display = 'block';
+        }
+
+        function loadRoomMessages() {
+            const messagesContainer = document.getElementById('roomMessagesContainer');
+            messagesContainer.innerHTML = '<div class="chat-info">Loading messages...</div>';
+            
+            if (roomMessagesListener) {
+                roomMessagesListener();
+            }
+            
+            roomMessagesListener = db.collection('rooms').doc(currentRoomId)
+                .collection('messages')
+                .orderBy('timestamp', 'asc')
+                .onSnapshot(snapshot => {
+                    messagesContainer.innerHTML = '';
+                    
+                    if (snapshot.empty) {
+                        messagesContainer.innerHTML = '<div class="chat-info">No messages yet</div>';
+                        return;
+                    }
+                    
+                    snapshot.forEach(doc => {
+                        const message = doc.data();
+                        const messageEl = document.createElement('div');
+                        messageEl.className = `message ${message.senderId === userData.userId ? 'sent' : 'received'}`;
+                        
+                        const time = message.timestamp ? message.timestamp.toDate() : new Date();
+                        const timeStr = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        
+                        messageEl.innerHTML = `
+                            <div class="message-sender">${message.senderId}</div>
+                            <div class="message-text">${message.text}</div>
+                            <div class="message-time">${timeStr}</div>
+                        `;
+                        
+                        messagesContainer.appendChild(messageEl);
+                    });
+                    
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }, err => {
+                    console.error('Error loading messages:', err);
+                    showNotification('Error loading messages', true);
+                });
+        }
+
+        function sendRoomMessage() {
+            const input = document.getElementById('roomMessageInput');
+            const text = input.value.trim();
+            
+            if (!text) return;
+            
+            db.collection('rooms').doc(currentRoomId)
+                .collection('messages')
+                .add({
+                    text: text,
+                    senderId: userData.userId,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                })
+                .then(() => {
+                    input.value = '';
+                })
+                .catch(err => {
+                    showNotification('Error sending message', true);
+                    console.error(err);
+                });
+        }
+
+        function showAddImageModal() {
+            document.getElementById('addImageModal').style.display = 'flex';
+        }
+
+        function addImageToRoom() {
+            const fileInput = document.getElementById('imageInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showNotification('Please select an image', true);
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                addImageToContainer(e.target.result);
+                closeModal('addImageModal');
+                fileInput.value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function addImageToContainer(src) {
+            const container = document.getElementById('userImagesContainer');
+            const wrapper = document.createElement('div');
+            wrapper.className = 'image-box-wrapper';
+            wrapper.style.position = 'absolute';
+            wrapper.style.top = '50%';
+            wrapper.style.left = '50%';
+            wrapper.style.transform = 'translate(-50%, -50%)';
+            wrapper.style.cursor = 'move';
+            
+            const img = document.createElement('img');
+            img.src = src;
+            img.style.maxWidth = '200px';
+            img.style.maxHeight = '200px';
+            img.style.userSelect = 'none';
+            
+            wrapper.appendChild(img);
+            addResizeControls(wrapper);
+            
+            // Make draggable
+            makeElementDraggable(wrapper);
+            
+            // Add context menu
+            wrapper.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                selectedImage = wrapper;
+                
+                const menu = document.getElementById('imageContextMenu');
+                menu.style.display = 'block';
+                menu.style.left = e.pageX + 'px';
+                menu.style.top = e.pageY + 'px';
+            });
+            
+            container.appendChild(wrapper);
+            imageCounter++;
+        }
+
+        function addResizeControls(wrapper) {
+            const positions = [
+                'left-top', 'left-bottom', 'right-top', 'right-bottom',
+                'top-mid', 'left-mid', 'right-mid', 'bottom-mid', 'rotate'
+            ];
+            
+            positions.forEach(pos => {
+                const dot = document.createElement('div');
+                dot.className = `dot ${pos}`;
+                wrapper.appendChild(dot);
+                
+                if (pos === 'rotate') {
+                    const rotateLink = document.createElement('div');
+                    rotateLink.className = 'rotate-link';
+                    wrapper.appendChild(rotateLink);
+                    makeRotatable(wrapper, dot);
+                } else {
+                    makeResizable(wrapper, dot, pos);
+                }
+            });
+        }
+
+        function makeElementDraggable(element) {
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+            
+            element.addEventListener('mousedown', function(e) {
+                if (e.target.classList.contains('dot')) return;
+                
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                
+                const style = window.getComputedStyle(element);
+                initialLeft = parseInt(style.left, 10) || 0;
+                initialTop = parseInt(style.top, 10) || 0;
+                
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('mouseup', stopDrag);
+                
+                e.preventDefault();
+            });
+            
+            function drag(e) {
+                if (!isDragging) return;
+                
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                
+                element.style.left = (initialLeft + dx) + 'px';
+                element.style.top = (initialTop + dy) + 'px';
+            }
+            
+            function stopDrag() {
+                isDragging = false;
+                document.removeEventListener('mousemove', drag);
+                document.removeEventListener('mouseup', stopDrag);
+            }
+        }
+
+        function makeResizable(element, control, position) {
+            control.addEventListener('mousedown', initResize);
+            
+            function initResize(e) {
+                e.stopPropagation();
+                
+                const startX = e.clientX;
+                const startY = e.clientY;
+                
+                const startWidth = parseInt(document.defaultView.getComputedStyle(element).width, 10);
+                const startHeight = parseInt(document.defaultView.getComputedStyle(element).height, 10);
+                
+                const startLeft = parseInt(document.defaultView.getComputedStyle(element).left, 10) || 0;
+                const startTop = parseInt(document.defaultView.getComputedStyle(element).top, 10) || 0;
+                
+                document.addEventListener('mousemove', resize);
+                document.addEventListener('mouseup', stopResize);
+                
+                function resize(e) {
+                    e.preventDefault();
+                    
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    
+                    let newWidth = startWidth;
+                    let newHeight = startHeight;
+                    let newLeft = startLeft;
+                    let newTop = startTop;
+                    
+                    if (position.includes('right')) {
+                        newWidth = startWidth + dx;
+                    }
+                    if (position.includes('bottom')) {
+                        newHeight = startHeight + dy;
+                    }
+                    if (position.includes('left')) {
+                        newWidth = startWidth - dx;
+                        newLeft = startLeft + dx;
+                    }
+                    if (position.includes('top')) {
+                        newHeight = startHeight - dy;
+                        newTop = startTop + dy;
+                    }
+                    
+                    // Minimum size constraint
+                    if (newWidth > 50) {
+                        element.style.width = newWidth + 'px';
+                        if (position.includes('left')) {
+                            element.style.left = newLeft + 'px';
+                        }
+                    }
+                    
+                    if (newHeight > 50) {
+                        element.style.height = newHeight + 'px';
+                        if (position.includes('top')) {
+                            element.style.top = newTop + 'px';
+                        }
+                    }
+                }
+                
+                function stopResize() {
+                    document.removeEventListener('mousemove', resize);
+                    document.removeEventListener('mouseup', stopResize);
+                }
+            }
+        }
+
+        function makeRotatable(element, control) {
+            control.addEventListener('mousedown', initRotate);
+            
+            function initRotate(e) {
+                e.stopPropagation();
+                
+                const rect = element.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                document.addEventListener('mousemove', rotate);
+                document.addEventListener('mouseup', stopRotate);
+                
+                function rotate(e) {
+                    const dx = e.clientX - centerX;
+                    const dy = e.clientY - centerY;
+                    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                    
+                    element.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+                }
+                
+                function stopRotate() {
+                    document.removeEventListener('mousemove', rotate);
+                    document.removeEventListener('mouseup', stopRotate);
+                }
+            }
+        }
+
+        function copySelectedImage() {
+            if (selectedImage) {
+                copiedImage = selectedImage.cloneNode(true);
+                document.getElementById('imageContextMenu').style.display = 'none';
+                showNotification('Image copied to clipboard');
+            }
+        }
+
+        function deleteSelectedImage() {
+            if (selectedImage) {
+                selectedImage.remove();
+                document.getElementById('imageContextMenu').style.display = 'none';
+                showNotification('Image deleted');
+            }
+        }
+
+        function toggleScreenShare() {
+            const btn = document.getElementById('screenShareBtn');
+            
+            if (activeScreenShareStream) {
+                // Stop screen share
+                activeScreenShareStream.getTracks().forEach(track => track.stop());
+                activeScreenShareWrapper.remove();
+                activeScreenShareStream = null;
+                activeScreenShareWrapper = null;
+                btn.textContent = 'Share Screen';
+                showNotification('Screen sharing stopped');
+            } else {
+                // Start screen share
+                if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+                    navigator.mediaDevices.getDisplayMedia({ video: true })
+                        .then(stream => {
+                            activeScreenShareStream = stream;
+                            
+                            const container = document.getElementById('userImagesContainer');
+                            const wrapper = document.createElement('div');
+                            wrapper.className = 'image-box-wrapper';
+                            wrapper.style.position = 'absolute';
+                            wrapper.style.top = '50px';
+                            wrapper.style.left = '50px';
+                            wrapper.style.width = '400px';
+                            wrapper.style.height = '300px';
+                            wrapper.style.zIndex = '10';
+                            wrapper.style.backgroundColor = '#000';
+                            
+                            const video = document.createElement('video');
+                            video.srcObject = stream;
+                            video.autoplay = true;
+                            video.style.width = '100%';
+                            video.style.height = '100%';
+                            video.style.objectFit = 'contain';
+                            
+                            wrapper.appendChild(video);
+                            addResizeControls(wrapper);
+                            makeElementDraggable(wrapper);
+                            
+                            container.appendChild(wrapper);
+                            activeScreenShareWrapper = wrapper;
+                            
+                            btn.textContent = 'Stop Sharing';
+                            showNotification('Screen sharing started');
+                            
+                            // Stop sharing when the user clicks the stop button in the browser UI
+                            stream.getTracks()[0].onended = function() {
+                                toggleScreenShare();
+                            };
+                        })
+                        .catch(err => {
+                            console.error('Error sharing screen:', err);
+                            showNotification('Error sharing screen', true);
+                        });
+                } else {
+                    showNotification('Screen sharing not supported', true);
+                }
+            }
+        }
+
+        // Close context menu when clicking elsewhere
+        document.addEventListener('click', function() {
+            document.getElementById('imageContextMenu').style.display = 'none';
+        });
+
+        // Generate a user ID (6 characters)
+        function generateUserId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < 6; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+        
+        // Show notification
+        function showNotification(message, isError = false) {
+            notification.textContent = message;
+            notification.className = 'notification' + (isError ? ' error' : '');
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Close modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // Show terms of use
+        function showTermsOfUse() {
+            document.getElementById('termsModal').style.display = 'flex';
+        }
+        
+        // Switch between sign in and sign up
+        function switchAuth() {
+            const isSignIn = formTitle.textContent.includes('Sign In');
+            
+            if (isSignIn) {
+                formTitle.textContent = 'Create an Account';
+                authButton.textContent = 'Sign Up';
+                authSwitch.innerHTML = 'Already have an account? <button onclick="switchAuth()">Sign In</button>';
+            } else {
+                formTitle.textContent = 'Sign In to Your Account';
+                authButton.textContent = 'Sign In';
+                authSwitch.innerHTML = 'Don\'t have an account? <button onclick="switchAuth()">Sign Up</button>';
+            }
+        }
+        
+        // Sign in or sign up
+        function signIn() {
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+            const isSignIn = formTitle.textContent.includes('Sign In');
+            
+            if (!email || !password) {
+                showNotification('Please enter email and password', true);
+                return;
+            }
+            
+            if (isSignIn) {
+                // Sign in
+                auth.signInWithEmailAndPassword(email, password)
+                    .then(() => {
+                        showNotification('Signed in successfully!');
+                    })
+                    .catch(error => {
+                        showNotification(error.message, true);
+                    });
+            } else {
+                // Sign up
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then(() => {
+                        showNotification('Account created successfully!');
+                    })
+                    .catch(error => {
+                        showNotification(error.message, true);
+                    });
+            }
+        }
+        
+        // Sign out
+        function logout() {
+            auth.signOut()
+                .then(() => {
+                    showNotification('Signed out successfully');
+                })
+                .catch(error => {
+                    showNotification(error.message, true);
+                });
+        }
+        
+        // Refresh page
+        function refreshPage() {
+            window.location.reload();
+        }
+        
+        // Copy user ID
+        function copyUserId() {
+            navigator.clipboard.writeText(userData.userId)
+                .then(() => {
+                    showNotification('User ID copied to clipboard!');
+                })
+                .catch(err => {
+                    showNotification('Failed to copy User ID', true);
+                });
+        }
+        
+        // Show add friend modal
+        function showAddFriendModal() {
+            document.getElementById('addFriendModal').style.display = 'flex';
+        }
+        
+        // Send friend request
+        async function sendFriendRequest() {
+            const friendId = friendIdInput.value.trim();
+            
+            if (!friendId) {
+                showNotification('Please enter a user ID', true);
+                return;
+            }
+            
+            if (friendId === userData.userId) {
+                showNotification('You cannot add yourself as a friend', true);
+                return;
+            }
+            
+            try {
+                // Check if user exists
+                const usersRef = db.collection('users');
+                const querySnapshot = await usersRef.where('userId', '==', friendId).get();
+                
+                if (querySnapshot.empty) {
+                    showNotification('User not found', true);
+                    return;
+                }
+                
+                const friendData = querySnapshot.docs[0].data();
+                const friendUid = querySnapshot.docs[0].id;
+                
+                // Check if already friends
+                if (userData.friends && userData.friends.includes(friendId)) {
+                    showNotification('You are already friends with this user', true);
+                    return;
+                }
+                
+                // Check if request already sent
+                if (userData.sentRequests && userData.sentRequests.includes(friendId)) {
+                    showNotification('Friend request already sent', true);
+                    return;
+                }
+                
+                // Check if already has a pending request from this user
+                if (userData.friendRequests && userData.friendRequests.includes(friendId)) {
+                    showNotification('This user has already sent you a friend request', true);
+                    return;
+                }
+                
+                // Add to sent requests
+                await db.collection('users').doc(currentUser.uid).update({
+                    sentRequests: firebase.firestore.FieldValue.arrayUnion(friendId)
+                });
+                
+                // Add to friend's received requests
+                await db.collection('users').doc(friendUid).update({
+                    friendRequests: firebase.firestore.FieldValue.arrayUnion(userData.userId)
+                });
+                
+                showNotification('Friend request sent!');
+                closeModal('addFriendModal');
+                friendIdInput.value = '';
+                
+                // Update UI
+                loadFriendRequests();
+                
+            } catch (error) {
+                showNotification('Error sending friend request', true);
+                console.error(error);
+            }
+        }
+        
+        // Load friends
+        async function loadFriends() {
+            if (!currentUser || !userData) return;
+            
+            try {
+                const friendsList = document.getElementById('friendsList');
+                friendsList.innerHTML = '<div class="loading">Loading friends...</div>';
+                
+                if (!userData.friends || userData.friends.length === 0) {
+                    friendsList.innerHTML = '<li class="no-friends">No friends yet. Add some friends!</li>';
+                    return;
+                }
+                
+                const usersRef = db.collection('users');
+                const querySnapshot = await usersRef.where('userId', 'in', userData.friends).get();
+                
+                friendsList.innerHTML = '';
+                
+                querySnapshot.forEach(doc => {
+                    const friendData = doc.data();
+                    const li = document.createElement('li');
+                    li.className = 'user-item';
+                    li.onclick = () => selectFriend(friendData.userId);
+                    
+                    li.innerHTML = `
+                        <div class="user-avatar">${friendData.email.charAt(0).toUpperCase()}</div>
+                        <div class="user-info">
+                            <div class="user-name">${friendData.userId}</div>
+                            <div class="user-id">${friendData.email}</div>
+                        </div>
+                        <div class="friend-actions">
+                            <button class="action-btn delete-btn" onclick="event.stopPropagation(); removeFriend('${friendData.userId}')">✕</button>
+                        </div>
+                    `;
+                    
+                    friendsList.appendChild(li);
+                });
+                
+            } catch (error) {
+                console.error('Error loading friends:', error);
+                friendsList.innerHTML = '<li class="no-friends">Error loading friends</li>';
+            }
+        }
+        
+        // Load friend requests
+        async function loadFriendRequests() {
+            if (!currentUser || !userData) return;
+            
+            try {
+                const requestsList = document.getElementById('requestsList');
+                const sentRequestsList = document.getElementById('sentRequestsList');
+                
+                requestsList.innerHTML = '<div class="loading">Loading requests...</div>';
+                sentRequestsList.innerHTML = '<div class="loading">Loading sent requests...</div>';
+                
+                // Received requests
+                if (!userData.friendRequests || userData.friendRequests.length === 0) {
+                    requestsList.innerHTML = '<li class="no-friends">No pending requests</li>';
+                } else {
+                    const usersRef = db.collection('users');
+                    const querySnapshot = await usersRef.where('userId', 'in', userData.friendRequests).get();
+                    
+                    requestsList.innerHTML = '';
+                    
+                    querySnapshot.forEach(doc => {
+                        const friendData = doc.data();
+                        const li = document.createElement('li');
+                        li.className = 'user-item';
+                        
+                        li.innerHTML = `
+                            <div class="user-avatar">${friendData.email.charAt(0).toUpperCase()}</div>
+                            <div class="user-info">
+                                <div class="user-name">${friendData.userId}</div>
+                                <div class="user-id">${friendData.email}</div>
+                            </div>
+                            <div class="friend-actions">
+                                <button class="action-btn accept-btn" onclick="acceptFriendRequest('${friendData.userId}')">✓</button>
+                                <button class="action-btn reject-btn" onclick="rejectFriendRequest('${friendData.userId}')">✕</button>
+                            </div>
+                        `;
+                        
+                        requestsList.appendChild(li);
+                    });
+                }
+                
+                // Sent requests
+                if (!userData.sentRequests || userData.sentRequests.length === 0) {
+                    sentRequestsList.innerHTML = '<li class="no-friends">No sent requests</li>';
+                } else {
+                    const usersRef = db.collection('users');
+                    const querySnapshot = await usersRef.where('userId', 'in', userData.sentRequests).get();
+                    
+                    sentRequestsList.innerHTML = '';
+                    
+                    querySnapshot.forEach(doc => {
+                        const friendData = doc.data();
+                        const li = document.createElement('li');
+                        li.className = 'user-item';
+                        
+                        li.innerHTML = `
+                            <div class="user-avatar">${friendData.email.charAt(0).toUpperCase()}</div>
+                            <div class="user-info">
+                                <div class="user-name">${friendData.userId}</div>
+                                <div class="user-id">${friendData.email}</div>
+                            </div>
+                            <div class="friend-actions">
+                                <button class="action-btn reject-btn" onclick="cancelFriendRequest('${friendData.userId}')">✕</button>
+                            </div>
+                        `;
+                        
+                        sentRequestsList.appendChild(li);
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error loading friend requests:', error);
+                requestsList.innerHTML = '<li class="no-friends">Error loading requests</li>';
+                sentRequestsList.innerHTML = '<li class="no-friends">Error loading sent requests</li>';
+            }
+        }
+        
+        // Accept friend request
+        async function acceptFriendRequest(friendId) {
+            try {
+                // Get friend's UID
+                const usersRef = db.collection('users');
+                const querySnapshot = await usersRef.where('userId', '==', friendId).get();
+                
+                if (querySnapshot.empty) {
+                    showNotification('User not found', true);
+                    return;
+                }
+                
+                const friendUid = querySnapshot.docs[0].id;
+                const friendData = querySnapshot.docs[0].data();
+                
+                // Remove from requests and add to friends for both users
+                await db.collection('users').doc(currentUser.uid).update({
+                    friendRequests: firebase.firestore.FieldValue.arrayRemove(friendId),
+                    friends: firebase.firestore.FieldValue.arrayUnion(friendId)
+                });
+                
+                await db.collection('users').doc(friendUid).update({
+                    sentRequests: firebase.firestore.FieldValue.arrayRemove(userData.userId),
+                    friends: firebase.firestore.FieldValue.arrayUnion(userData.userId)
+                });
+                
+                showNotification('Friend request accepted!');
+                
+                // Update UI
+                loadFriends();
+                loadFriendRequests();
+                
+            } catch (error) {
+                showNotification('Error accepting friend request', true);
+                console.error(error);
+            }
+        }
+        
+        // Reject friend request
+        async function rejectFriendRequest(friendId) {
+            try {
+                // Get friend's UID
+                const usersRef = db.collection('users');
+                const querySnapshot = await usersRef.where('userId', '==', friendId).get();
+                
+                if (querySnapshot.empty) {
+                    showNotification('User not found', true);
+                    return;
+                }
+                
+                const friendUid = querySnapshot.docs[0].id;
+                
+                // Remove from requests for both users
+                await db.collection('users').doc(currentUser.uid).update({
+                    friendRequests: firebase.firestore.FieldValue.arrayRemove(friendId)
+                });
+                
+                await db.collection('users').doc(friendUid).update({
+                    sentRequests: firebase.firestore.FieldValue.arrayRemove(userData.userId)
+                });
+                
+                showNotification('Friend request rejected');
+                
+                // Update UI
+                loadFriendRequests();
+                
+            } catch (error) {
+                showNotification('Error rejecting friend request', true);
+                console.error(error);
+            }
+        }
+        
+        // Cancel friend request
+        async function cancelFriendRequest(friendId) {
+            try {
+                // Get friend's UID
+                const usersRef = db.collection('users');
+                const querySnapshot = await usersRef.where('userId', '==', friendId).get();
+                
+                if (querySnapshot.empty) {
+                    showNotification('User not found', true);
+                    return;
+                }
+                
+                const friendUid = querySnapshot.docs[0].id;
+                
+                // Remove from sent requests for current user
+                await db.collection('users').doc(currentUser.uid).update({
+                    sentRequests: firebase.firestore.FieldValue.arrayRemove(friendId)
+                });
+                
+                // Remove from received requests for friend
+                await db.collection('users').doc(friendUid).update({
+                    friendRequests: firebase.firestore.FieldValue.arrayRemove(userData.userId)
+                });
+                
+                showNotification('Friend request cancelled');
+                
+                // Update UI
+                loadFriendRequests();
+                
+            } catch (error) {
+                showNotification('Error cancelling friend request', true);
+                console.error(error);
+            }
+        }
+        
+        // Remove friend
+        async function removeFriend(friendId) {
+            if (!confirm('Are you sure you want to remove this friend?')) {
+                return;
+            }
+            
+            try {
+                // Get friend's UID
+                const usersRef = db.collection('users');
+                const querySnapshot = await usersRef.where('userId', '==', friendId).get();
+                
+                if (querySnapshot.empty) {
+                    showNotification('User not found', true);
+                    return;
+                }
+                
+                const friendUid = querySnapshot.docs[0].id;
+                
+                // Remove from friends for both users
+                await db.collection('users').doc(currentUser.uid).update({
+                    friends: firebase.firestore.FieldValue.arrayRemove(friendId)
+                });
+                
+                await db.collection('users').doc(friendUid).update({
+                    friends: firebase.firestore.FieldValue.arrayRemove(userData.userId)
+                });
+                
+                showNotification('Friend removed');
+                
+                // Update UI
+                loadFriends();
+                
+                // If the removed friend was selected, clear the chat
+                if (selectedFriend === friendId) {
+                    selectedFriend = null;
+                    currentChat.textContent = 'Friends Chat';
+                    chatInfo.textContent = 'Only friends can see your messages';
+                    messagesContainer.innerHTML = '<div class="chat-info">Select a friend to start chatting</div>';
+                    messageInput.disabled = true;
+                    sendButton.disabled = true;
+                    
+                    // Remove messages listener
+                    if (messagesListener) {
+                        messagesListener();
+                        messagesListener = null;
+                    }
+                }
+                
+            } catch (error) {
+                showNotification('Error removing friend', true);
+                console.error(error);
+            }
+        }
+        
+        // Select friend to chat with
+        function selectFriend(friendId) {
+            selectedFriend = friendId;
+            currentChat.textContent = `Chat with ${friendId}`;
+            chatInfo.textContent = 'Only you and your friend can see these messages';
+            messageInput.disabled = false;
+            sendButton.disabled = false;
+            
+            // Remove previous messages listener
+            if (messagesListener) {
+                messagesListener();
+            }
+            
+            // Load messages
+            loadMessages(friendId);
+        }
+        
+        // Load messages with a friend
+        function loadMessages(friendId) {
+            messagesContainer.innerHTML = '<div class="chat-info">Loading messages...</div>';
+            
+            // Generate a unique chat ID for these two users
+            const chatId = [userData.userId, friendId].sort().join('_');
+            
+            messagesListener = db.collection('chats').doc(chatId)
+                .collection('messages')
+                .orderBy('timestamp', 'asc')
+                .onSnapshot(snapshot => {
+                    messagesContainer.innerHTML = '';
+                    
+                    if (snapshot.empty) {
+                        messagesContainer.innerHTML = '<div class="chat-info">No messages yet. Start the conversation!</div>';
+                        return;
+                    }
+                    
+                    snapshot.forEach(doc => {
+                        const message = doc.data();
+                        const messageEl = document.createElement('div');
+                        messageEl.className = `message ${message.senderId === userData.userId ? 'sent' : 'received'}`;
+                        
+                        const time = message.timestamp ? message.timestamp.toDate() : new Date();
+                        const timeStr = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        
+                        messageEl.innerHTML = `
+                            <div class="message-sender">${message.senderId}</div>
+                            <div class="message-text">${message.text}</div>
+                            <div class="message-time">${timeStr}</div>
+                        `;
+                        
+                        messagesContainer.appendChild(messageEl);
+                    });
+                    
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }, err => {
+                    console.error('Error loading messages:', err);
+                    showNotification('Error loading messages', true);
+                });
+        }
+
+        // Send message to friend
+        function sendMessage() {
+            if (!selectedFriend) {
+                showNotification('Please select a friend to chat with', true);
+                return;
+            }
+            
+            const text = messageInput.value.trim();
+            
+            if (!text) {
+                return;
+            }
+            
+            // Generate a unique chat ID for these two users
+            const chatId = [userData.userId, selectedFriend].sort().join('_');
+            
+            db.collection('chats').doc(chatId).collection('messages').add({
+                text: text,
+                senderId: userData.userId,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                messageInput.value = '';
+            })
+            .catch(error => {
+                showNotification('Error sending message', true);
+                console.error(error);
+            });
+        }
+        
+        // Switch between tabs
+        function switchTab(tabName) {
+            // Update button states
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+        
+        // Handle Enter key in message input
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Handle Enter key in room message input
+        document.getElementById('roomMessageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendRoomMessage();
+            }
+        });
+        
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            const modals = document.getElementsByClassName('modal');
+            for (let i = 0; i < modals.length; i++) {
+                if (event.target === modals[i]) {
+                    modals[i].style.display = 'none';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
