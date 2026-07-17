@@ -1,6 +1,30 @@
 # Hello lovely stay members
 <br>
 
+This is **evidence and proof** which we gathered.<br>
+Were trying to bring you the facts while `the person`'s statements are: <br>
+"Im only 17 years old not 18". She is not 17 btw.<br>
+"Please you have to believe me"<br>
+*spreads wrong information about tamino's and bull3t's personal life* which is **disgusting.** instead of proof.<br>
+*Not willing to show commits of the github repo that she did*<br>
+<br>
+
+We are making this because we dont want `the person` to make profit of us and OUR code. The community shouldnt donate to a project where `the person` cant do anything.<br>
+
+> [!IMPORTANT]<br>
+> ANALYTIC EVIDENCE<br>
+> In the file: [LIES_PUT_PANTS_ON_FIRE.md](LIES_PUT_PANTS_ON_FIRE.md)
+> You can see all new evidence we collected internally.
+> Read carefully
+
+> [!IMPORTANT]<br>
+> NEW EVIDENCE:<br>
+> in this file: [NEW.md](NEW.md)<br>
+> Also i DIDNT leave stay 1-2 Years ago! I left 2 Months ago because of her.<br>
+> <br>
+> Were only making this because `the person` is trying to profit of our CODE and work. While `the person` **banned us** from the Discord Server on 15.07.25. When we answered to someone that we're the devs.
+
+
 > [!NOTE]
 > The Person:<br>
 > ![person](src/Assets/person.png)<br>
@@ -21,6 +45,10 @@ but she as the `founder and developer` never has written code in these two years
 The source code is in our hands because `the person` has never made anything, brought people to us, with `server programming skill`, for stuff we never intended to do, wanting us to implement payment before even the features are made and **not knowing** how `servers/hosting` even works.
 
 ## The person
+
+>[!WARNING]<br>
+> `The person` made all of the repositories at the bottom private. (hmmmm?)<br>
+
 `The person` does no care about his developers who do all her work. It was supposed to be a `friends project` but it turned out with a `evil ceo` :c<br>
 <!-- She was mentally manipulating for a while, thats the reason i stopped, hidden, not in the official readme -->
 Never appreciating the work we have done for (her saying) "her project"<br>
